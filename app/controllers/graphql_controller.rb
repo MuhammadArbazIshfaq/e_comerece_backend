@@ -53,12 +53,27 @@ class GraphqlController < ApplicationController
   end
 
 def current_user
-    token = cookies[:jwt] # ✅ read from HTTP-only cookie
-    return nil unless token
-    decoded = JsonWebToken.decode(token)
-    User.find_by(id: decoded[:user_id]) if decoded
-  rescue
-    nil
-  end
+  # Use request.cookies here
+  token = request.cookies['jwt'] || request.headers['Authorization']
+  Rails.logger.info "AUTH HEADER: #{request.headers['Authorization']}"
+  Rails.logger.info "COOKIE JWT: #{request.cookies['jwt']}"
+
+  return nil unless token
+
+  # Handle both "Bearer <token>" and raw "<token>"
+  token = token.split(' ').last if token.include?(' ')
+
+  Rails.logger.info "USING TOKEN: #{token}"
+
+  decoded = JsonWebToken.decode(token)
+  Rails.logger.info "DECODED PAYLOAD: #{decoded.inspect}"
+
+  User.find_by(id: decoded[:user_id]) if decoded
+rescue => e
+  Rails.logger.error "CURRENT_USER ERROR: #{e.message}"
+  nil
+end
+
+
 
 end

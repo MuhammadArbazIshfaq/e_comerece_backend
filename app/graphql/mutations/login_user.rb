@@ -6,9 +6,9 @@ module Mutations
 
     field :user, Types::UserType, null: true
     field :errors, [String], null: false
-
     def resolve(email:, password:)
       user = User.find_by(email: email)
+puts "USER: #{user.inspect}"
 
       if user && user.authenticate(password)
         token = JsonWebToken.encode(user_id: user.id)
