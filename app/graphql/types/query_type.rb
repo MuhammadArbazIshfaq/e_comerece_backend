@@ -35,7 +35,7 @@ module Types
       field :products, [Types::ProductType], null: false
 
 def products
-  Product.all
+Product.all
 end
 
 field :product, Types::ProductType, null: true do
