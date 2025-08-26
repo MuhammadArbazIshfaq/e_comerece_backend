@@ -33,6 +33,7 @@ module Types
       description: "Return the current logged-in user"
 
       field :products, [Types::ProductType], null: false
+
 def products
   Product.all
 end
@@ -44,8 +45,17 @@ def product(id:)
   Product.find_by(id: id)
 end
 
-    def me
-      context[:current_user]
-    end
+field :categories, [Types::CategoryType], null: false
+
+def categories
+  Category.all
+end
+
+field :category, Types::CategoryType, null: true do
+  argument :id, ID, required: true
+end
+def category(id:)
+  Category.find_by(id: id)
+end
   end
 end

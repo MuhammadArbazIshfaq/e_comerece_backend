@@ -7,6 +7,8 @@ module Types
     field :create_category, mutation: Mutations::CreateCategory
     field :update_product, mutation: Mutations::UpdateProduct
     field :delete_product, mutation: Mutations::DeleteProduct
+    field :update_category, mutation: Mutations::UpdateCategory
+    field :delete_category, mutation: Mutations::DeleteCategory
 
   end
 end
