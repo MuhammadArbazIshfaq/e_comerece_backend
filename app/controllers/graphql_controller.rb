@@ -7,13 +7,49 @@ class GraphqlController < ApplicationController
   # protect_from_forgery with: :null_session
 
   def execute
-    variables = prepare_variables(params[:variables])
-    query = params[:query]
-    operation_name = params[:operationName]
+    # Handle multipart upload requests
+    if params[:operations].present?
+      handle_multipart_request
+    else
+      handle_regular_request
+    end
+  end
+
+  private
+
+  def handle_multipart_request
+    operations = JSON.parse(params[:operations])
+    map = JSON.parse(params[:map]) if params[:map]
+    
+    # Handle file uploads - map them to the variables
+    if map
+      variables = operations['variables'] || {}
+      
+      map.each do |file_key, paths|
+        file = params[file_key]
+        paths.each do |path|
+          # Handle common cases like "variables.images.0"
+          parts = path.split('.')
+          if parts.length == 3 && parts[0] == 'variables' && parts[1] == 'images'
+            index = parts[2].to_i
+            variables['images'] ||= []
+            variables['images'][index] = file
+          end
+        end
+      end
+      
+      operations['variables'] = variables
+    end
+    
+    variables = operations['variables'] || {}
+    query = operations['query']
+    operation_name = operations['operationName']
+    
     context = {
       current_user: current_user,
-      response: response  # expose Rails response to mutations
+      response: response
     }
+    
     result = EcommerceBackendSchema.execute(
       query,
       variables: variables,
@@ -23,7 +59,22 @@ class GraphqlController < ApplicationController
     render json: result
   end
 
-  private
+  def handle_regular_request
+    variables = prepare_variables(params[:variables])
+    query = params[:query]
+    operation_name = params[:operationName]
+    context = {
+      current_user: current_user,
+      response: response
+    }
+    result = EcommerceBackendSchema.execute(
+      query,
+      variables: variables,
+      context: context,
+      operation_name: operation_name
+    )
+    render json: result
+  end
 
   # Handle variables in form data, JSON body, or a blank value
   def prepare_variables(variables_param)

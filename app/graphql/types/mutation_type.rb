@@ -9,6 +9,11 @@ module Types
     field :delete_product, mutation: Mutations::DeleteProduct
     field :update_category, mutation: Mutations::UpdateCategory
     field :delete_category, mutation: Mutations::DeleteCategory
+    field :upload_product_images, mutation: Mutations::UploadProductImages
+    field :add_to_cart, mutation: Mutations::AddToCart
+    field :remove_from_cart, mutation: Mutations::RemoveFromCart
+    field :update_cart_item, mutation: Mutations::UpdateCartItem
+    
 
   end
 end

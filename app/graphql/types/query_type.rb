@@ -57,5 +57,14 @@ end
 def category(id:)
   Category.find_by(id: id)
 end
+# app/graphql/types/query_type.rb
+field :my_cart, Types::CartType, null: true do
+  description "Fetch the current user's cart"
+end
+
+def my_cart
+  context[:current_user]&.cart || Cart.create(user: context[:current_user])
+end
+
   end
 end

@@ -10,7 +10,13 @@ module Types
 
     def image_urls
       if object.images.attached?
-        object.images.map { |img| Rails.application.routes.url_helpers.url_for(img) }
+        object.images.map do |img|
+          if Rails.env.development?
+            "http://localhost:3000#{Rails.application.routes.url_helpers.rails_blob_path(img, only_path: true)}"
+          else
+            Rails.application.routes.url_helpers.url_for(img)
+          end
+        end
       else
         []
       end
