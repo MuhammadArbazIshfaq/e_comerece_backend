@@ -2,6 +2,7 @@
 
 module Types
   class QueryType < Types::BaseObject
+    include Helpers::AuthorizationHelper
     field :node, Types::NodeType, null: true, description: "Fetches an object given its ID." do
       argument :id, ID, required: true, description: "ID of the object."
     end
@@ -31,6 +32,9 @@ module Types
 
     field :me, Types::UserType, null: true,
       description: "Return the current logged-in user"
+def me
+  context[:current_user]
+end
 
       field :products, [Types::ProductType], null: false
 
@@ -66,5 +70,25 @@ def my_cart
   context[:current_user]&.cart || Cart.create(user: context[:current_user])
 end
 
+
+field :order_history, [Types::OrderType], null: false
+
+def order_history
+  user = context[:current_user]
+  raise GraphQL::ExecutionError, "Not authenticated" unless user
+
+  user.orders.order(created_at: :desc)
+end
+
+
+ field :admin_orders, [Types::OrderType], null: false,
+          description: "List all orders (admin only)"
+
+    def admin_orders
+      user = context[:current_user]
+      authorize_admin!
+
+      Order.all.order(created_at: :desc)
+    end
   end
 end

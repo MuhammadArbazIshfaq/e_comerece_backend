@@ -13,7 +13,8 @@ module Types
     field :add_to_cart, mutation: Mutations::AddToCart
     field :remove_from_cart, mutation: Mutations::RemoveFromCart
     field :update_cart_item, mutation: Mutations::UpdateCartItem
-    
+    field :checkout, mutation: Mutations::Checkout
+    field :update_order_status, mutation: Mutations::UpdateOrderStatus
 
   end
 end

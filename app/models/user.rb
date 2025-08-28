@@ -5,4 +5,5 @@ class User < ApplicationRecord
   validates :role, inclusion: { in: ["customer", "admin"] }
   
   has_one :cart, dependent: :destroy
+  has_many :orders, dependent: :destroy
 end
