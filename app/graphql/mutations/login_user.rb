@@ -6,6 +6,7 @@ module Mutations
 
     field :user, Types::UserType, null: true
     field :errors, [String], null: false
+    field :token, String, null: true
     def resolve(email:, password:)
       user = User.find_by(email: email)
 puts "USER: #{user.inspect}"
